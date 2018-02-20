@@ -35,6 +35,7 @@ class Users extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
             [['level'], 'integer'],
             [['username', 'password'], 'string', 'max' => 255],
             [['username'], 'unique'],
+            [['username'], 'email'],
             [['password'], 'unique'],
         ];
     }
@@ -46,7 +47,7 @@ class Users extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
     {
         return [
             'id' => 'ID',
-            'username' => 'Username',
+            'username' => 'E-mail',
             'password' => 'Password',
             'level' => 'Level',
         ];

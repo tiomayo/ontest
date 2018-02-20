@@ -10,7 +10,7 @@ use kartik\datetime\DateTimePicker;
 /* @var $this yii\web\View */
 /* @var $model app\models\Users */
 
-$this->title = 'Tambah Peserta';
+$this->title = 'Tambah Ujian';
 $this->params['breadcrumbs'][] = $this->title;
 
 $gridColumns = [
@@ -33,7 +33,7 @@ $this->registerJs('
 	$("#next-button").on("click",function() {
 		var keys = $("#gridview-user").yiiGridView("getSelectedRows");
 		$.post({
-			url: "'.Url::to(['next']).'",
+			url: "'.Url::to(['save-ujian']).'",
 			dataType: "json",
 			data: {peserta: keys},
 		});
@@ -45,7 +45,39 @@ $this->registerJs('
 	});
 ')
 ?>
-<h1><?= Html::encode($this->title) ?></h1>
+<div class="row">
+	<div class="col-lg-4">
+
+    	<?php $form = ActiveForm::begin(['id' => 'jadwal-form','enableAjaxValidation' => true]); ?>
+
+	    <?= $form->field($model, 'waktu_tes')->widget(DateTimePicker::classname(), [
+	    			'name' => 'datetime_start',
+	                'type' => DateTimePicker::TYPE_COMPONENT_APPEND,
+	                'options' => ['placeholder' => 'Waktu Mulai'],
+	                'pluginOptions' => [
+	                    'autoclose'=>true,
+	                ]
+	          ]); ?>
+
+	    <?= $form->field($model, 'waktu_selesai')->widget(DateTimePicker::classname(), [
+	    			'name' => 'datetime_finish',
+	                'type' => DateTimePicker::TYPE_COMPONENT_APPEND,
+	                'options' => ['placeholder' => 'Waktu Selesai'],
+	                'pluginOptions' => [
+	                    'autoclose'=>true,
+	                ]
+	          ]); ?>
+
+	    <?= $form->field($model, 'instruksi')->textarea(['rows' => 6]) ?>
+
+	</div>
+	<div class="col-lg-4">
+		<div class="form-group">
+	        <?= Html::submitButton('Save', ['class' => 'btn btn-success', 'id'=>'next-button-1']) ?>
+	    </div>
+	    <?php ActiveForm::end(); ?>
+	</div>
+</div>
 <div class="row">
 	<div class="users-create">
 	    <div class="col-lg-6">
@@ -65,7 +97,6 @@ $this->registerJs('
 	    	])?>
 	    </div>
 	</div>
-	<?php $form = ActiveForm::begin(['id' => 'jadwal-form','enableAjaxValidation' => true]); ?>
 	<div class="col-lg-6">
 		<?= GridView::widget([
 		    'dataProvider' => $dataProviderSoal,
@@ -80,35 +111,6 @@ $this->registerJs('
 		        'heading' => '<i class="glyphicon glyphicon-book"></i>  Soal',
 		    ],
     	])?>
-	</div>
-</div>
-<div class="row">
-    <div class="col-lg-4">
-
-	    <?= $form->field($jadwal, 'waktu_tes')->widget(DateTimePicker::classname(), [
-	    			'name' => 'datetime_start',
-	                'type' => DateTimePicker::TYPE_COMPONENT_APPEND,
-	                'options' => ['placeholder' => 'Waktu Mulai'],
-	                'pluginOptions' => [
-	                    'autoclose'=>true,
-	                ]
-	          ]); ?>
-
-	    <?= $form->field($jadwal, 'waktu_selesai')->widget(DateTimePicker::classname(), [
-	    			'name' => 'datetime_finish',
-	                'type' => DateTimePicker::TYPE_COMPONENT_APPEND,
-	                'options' => ['placeholder' => 'Waktu Selesai'],
-	                'pluginOptions' => [
-	                    'autoclose'=>true,
-	                ]
-	          ]); ?>
-
-	    <?= $form->field($jadwal, 'instruksi')->textarea(['rows' => 6]) ?>
-
-	    <div class="form-group">
-	        <?= Html::submitButton('Save', ['class' => 'btn btn-success', 'id'=>'next-button-1']) ?>
-	    </div>
-	    <?php ActiveForm::end(); ?>
 	</div>
 </div>
 <div class="modal fade bs-modal-lg" id="modal-soal">

@@ -80,6 +80,8 @@ class UsersController extends Controller
             $model->password = substr($str, 0,6);
             $model->level = 2;
             $model->save();
+
+            return $this->redirect(Yii::$app->request->referrer);
         }
 
         return $this->renderAjax('create', [

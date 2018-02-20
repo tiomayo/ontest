@@ -140,43 +140,20 @@ class SiteController extends Controller
             'query' => Soal::find(),
         ]);
 
-        $model = new Users();
-        $jadwal = new Jadwal();
-        $soal = new Soal();
+        $model = new Jadwal();
 
         if ($model->load(Yii::$app->request->post())) {
             if (Yii::$app->request->isAjax) {
                 \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
                 return ActiveForm::validate($model); }
 
-            $model->attributes = $_POST['Users'];
-
-            $str = $_POST['Users']['username'];
-            $str = substr($str, 0, 10);
-            $str = hash('sha256', $str);
-            $model->password = substr($str, 0,6);
-            $model->level = 2;
-            $model->save();
-        }
-
-        elseif ($model->load(Yii::$app->request->post()) && $soal->load(Yii::$app->request->post())) {
-            if (Yii::$app->request->isAjax) {
-                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                return ActiveForm::validate($model);
-                return ActiveForm::validate($soal); }
-
             $model->attributes = $_POST['Jadwal'];
-            $model->attributes = $_POST['Soal'];
             $model->save();
-            $soal->save();
         }
-
 
         return $this->render('_peserta', [
-            'model' => $model,
             'dataProvider' => $dataProvider,
-            'jadwal' => $jadwal,
-            'soal' => $soal,
+            'model' => $model,
             'dataProviderSoal' => $dataProviderSoal,
         ]);
     }

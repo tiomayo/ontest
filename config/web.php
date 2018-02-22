@@ -51,6 +51,13 @@ $config = [
             'rules' => [
             ],
         ],
+
+        'formatter' => [
+           'dateFormat' => 'd-MMM-Y',
+           'datetimeFormat' => 'd-MMM-Y H:i:s',
+           'timeFormat' => 'H:i:s',
+           'defaultTimeZone' => 'Asia/Jakarta',
+        ],
         
     ],
     'params' => $params,

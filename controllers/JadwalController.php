@@ -67,26 +67,20 @@ class JadwalController extends Controller
     public function actionCreate()
     {
         $model = new Jadwal();
-        $soal = new Soal();
-        $dataProvider = new ActiveDataProvider([
-            'query' => Soal::find(),
-        ]);
 
-        if ($model->load(Yii::$app->request->post()) && $soal->load(Yii::$app->request->post())) {
+        if ($model->load(Yii::$app->request->post())) {
             if (Yii::$app->request->isAjax) {
                 \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
                 return ActiveForm::validate($model);
-                return ActiveForm::validate($soal); }
+            }            
 
             $model->attributes = $_POST['Jadwal'];
-            $model->attributes = $_POST['Soal'];
-            $model->save();
-            $soal->save();
+            if ($model->save(false)) {
+                return $this->redirect(['/users/create','jadwal'=>$model]);
+            }
         }    
         return $this->render('create', [
             'model' => $model,
-            'soal' => $soal,
-            'dataProvider' => $dataProvider,
         ]);
     }
 

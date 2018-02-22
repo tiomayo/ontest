@@ -11,6 +11,9 @@ use Yii;
  * @property string $username
  * @property string $password
  * @property int $level
+ * @property int $id_jadwal
+ *
+ * @property Jadwal $jadwal 
  */
 class Users extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
 {
@@ -32,11 +35,12 @@ class Users extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
     {
         return [
             [['username', 'password', 'level'], 'required'],
-            [['level'], 'integer'],
+            [['level', 'id_jadwal'], 'integer'],
             [['username', 'password'], 'string', 'max' => 255],
             [['username'], 'unique'],
             [['username'], 'email'],
             [['password'], 'unique'],
+            [['id_jadwal'], 'exist', 'skipOnError' => true, 'targetClass' => Jadwal::className(), 'targetAttribute' => ['id_jadwal' => 'id']],
         ];
     }
 
@@ -47,10 +51,16 @@ class Users extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
     {
         return [
             'id' => 'ID',
+            'id_jadwal' => 'Id Jadwal',
             'username' => 'E-mail',
             'password' => 'Password',
             'level' => 'Level',
         ];
+    }
+
+    public function getJadwal()
+    {
+        return $this->hasOne(Jadwal::className(), ['id' => 'id_jadwal']);
     }
 
     /**

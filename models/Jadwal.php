@@ -12,7 +12,7 @@ use Yii;
  * @property string $waktu_selesai
  * @property string $instruksi
  *
- * @property DetailTes[] $detailTes
+ * @property Users[] $users
  */
 class Jadwal extends \yii\db\ActiveRecord
 {
@@ -53,8 +53,31 @@ class Jadwal extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getDetailTes()
+    public function getUsers()
     {
-        return $this->hasMany(DetailTes::className(), ['id_jadwal' => 'id']);
+        return $this->hasMany(Users::className(), ['id_jadwal' => 'id']);
+    }
+
+    public function getDurasi($waktu_tes, $waktu_selesai)
+    {
+        $diff = abs(strtotime($waktu_tes) - strtotime($waktu_selesai));
+
+        $years = floor($diff / (365*60*60*24));
+        $months = floor(($diff - $years * 365*60*60*24) / (30*60*60*24));
+        $days = floor(($diff - $years * 365*60*60*24 - $months*30*60*60*24)/ (60*60*24));
+        $hours = floor(($diff - $years * 365*60*60*24 - $months*30*60*60*24 - $days*60*60*24)/ (60*60));
+        $minutes = floor(($diff - $years * 365*60*60*24 - $months*30*60*60*24 - $days*60*60*24 - $hours*60*60)/ (60));
+
+        return $hours." jam, ".$minutes." menit";
+    }
+
+    public function getJumlahPeserta($id)
+    {
+        return Users::find()->where(['id_jadwal' => $this->id ])->count();
+    }
+
+    public function getJumlahSoal($id)
+    {
+        return Soal::find()->where(['id_jadwal' => $this->id ])->count();
     }
 }

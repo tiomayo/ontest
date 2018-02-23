@@ -80,10 +80,23 @@ $this->title = 'Detail Tes Online';
                 </div>
                 <div class="panel-body">
                     <table class="table table-striped">
+                        <tr>
+                            <th class="text-center">No.</th>
+                            <th class="text-center">Soal</th>
+                            <th class="text-center">Pilihan A</th>
+                            <th class="text-center">Pilihan B</th>
+                            <th class="text-center">Pilihan C</th>
+                            <th class="text-center">Pilihan D</th>
+                            <th class="text-center"></th>
+                        </tr>
                     <?php $i=1; foreach ($daftarSoal->models as $s): ?>
                         <tr>
                             <th class="text-center"><?= $i.'.' ?></th>
                             <td><?= $s->soal ?></td>
+                            <td><?= $s->pilihan_A ?></td>
+                            <td><?= $s->pilihan_B ?></td>
+                            <td><?= $s->pilihan_C ?></td>
+                            <td><?= $s->pilihan_D ?></td>
                             <td><?= Html::a('<i class="glyphicon glyphicon-trash"></i>', ['/soal/delete', 'id' => $s->id], ['class' => 'btn btn-danger btn-xs', 'data-confirm' => 'Are you sure you want to delete?', 'data-method' => 'post', 'data-pjax' => '0',]) ?></td>
                         </tr>
                     <?php $i++; endforeach; ?>

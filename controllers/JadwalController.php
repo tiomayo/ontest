@@ -10,6 +10,8 @@ use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\bootstrap\ActiveForm;
+use yii\filters\AccessControl;
+use app\components\AccessRule;
 
 /**
  * JadwalController implements the CRUD actions for Jadwal model.
@@ -22,6 +24,20 @@ class JadwalController extends Controller
     public function behaviors()
     {
         return [
+            'access' => [
+                'class' => AccessControl::className(),
+                'ruleConfig' => [
+                    'class' => AccessRule::className(),
+                ],
+                'only' => ['index','view','create','delete','update'],
+                'rules' => [
+                    [
+                        'actions' => ['index','view','create','delete','update'],
+                        'allow' => true,
+                        'roles' => [Users::admin],
+                    ],
+                ],
+            ],
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
@@ -81,17 +97,6 @@ class JadwalController extends Controller
         }    
         return $this->render('create', [
             'model' => $model,
-        ]);
-    }
-
-    public function actionSelectSoal()
-    {
-        $dataProvider = new ActiveDataProvider([
-            'query' => Soal::find()
-        ]);
-
-        return $this->renderAjax('_soal', [
-            'dataProvider' => $dataProvider,
         ]);
     }
 

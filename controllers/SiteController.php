@@ -15,6 +15,7 @@ use app\models\Users;
 use app\models\Jadwal;
 use app\models\Soal;
 use app\models\Model;
+use app\models\Hasiltes;
 use app\components\AccessRule;
 
 class SiteController extends Controller
@@ -30,7 +31,7 @@ class SiteController extends Controller
                 'ruleConfig' => [
                     'class' => AccessRule::className(),
                 ],
-                'only' => ['index','logout','start','next','tambah-peserta','tambah-soal','view'],
+                'only' => ['index','logout','start','next','tambah-peserta','tambah-soal','view','instruksi','mulaites','savehasil'],
                 'rules' => [
                     [
                         'actions' => ['index'],
@@ -41,6 +42,11 @@ class SiteController extends Controller
                         'actions' => ['start','next','tambah-peserta','tambah-soal','view'],
                         'allow' => true,
                         'roles' => [Users::admin]
+                    ],
+                    [
+                        'actions' => ['instruksi','mulaites','savehasil'],
+                        'allow' => true,
+                        'roles' => [Users::peserta],
                     ],
                     [
                         'actions' => ['logout'],
@@ -335,6 +341,17 @@ class SiteController extends Controller
 
     public function actionSaveHasil($id)
     {
-        
+        $jadwal = Jadwal::findOne($id);
+        $peserta = Yii::$app->session->get('peserta');
+        $soal = Soal::find()->where(['id_jadwal' => $id])->count();
+
+        for ($jawaban = 1; $jawaban<$soal;$jawaban++){
+
+            $hasil = new Hasiltes();
+
+            $hasil->id_jadwal = $jadwal->id;
+            $hasil->id_peserta = $peserta;
+            $hasil->id_soal = $jawaban;
+        }
     }
 }

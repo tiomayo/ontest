@@ -9,6 +9,8 @@ use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\bootstrap\ActiveForm;
+use yii\filters\AccessControl;
+use app\components\AccessRule;
 
 /**
  * SoalController implements the CRUD actions for Soal model.
@@ -21,6 +23,20 @@ class SoalController extends Controller
     public function behaviors()
     {
         return [
+            'access' => [
+                'class' => AccessControl::className(),
+                'ruleConfig' => [
+                    'class' => AccessRule::className(),
+                ],
+                'only' => ['index','view','create','delete','update'],
+                'rules' => [
+                    [
+                        'actions' => ['index','view','create','delete','update'],
+                        'allow' => true,
+                        'roles' => [Users::admin],
+                    ],
+                ],
+            ],
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [

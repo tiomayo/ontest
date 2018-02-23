@@ -34,7 +34,7 @@ $(document).ready(function(){
         $.ajax({
             type: "POST",
             url: '<?= Url::to(['save-hasil', 'id' => $jadwal->id]) ?>',
-            data: soal,
+            data: $('#soal').serialize(),
             success: function(data){
                 alert(data);
             }

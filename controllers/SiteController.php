@@ -98,6 +98,12 @@ class SiteController extends Controller
         if (Yii::$app->user->isGuest) {
             $this->redirect(['login']);
         } elseif ($isPeserta) {
+            $user = Users::findOne($isPeserta);
+            if ($user->step === 1) {
+                return $this->redirect(['instruksi','id'=>$isPeserta]);
+            } elseif ($user->step === 2) {
+                return $this->redirect(['mulaites','id'=>$user->id_jadwal]);
+            }
             return $this->render('disclaimer');
         } else {
             $dataProvider = new ActiveDataProvider([
@@ -324,15 +330,26 @@ class SiteController extends Controller
 
     public function actionInstruksi($id)
     {
-        $this->layout = 'form';
+        $this->layout = 'blank';
         $user = Users::findOne($id);
-        $jadwal = Jadwal::findOne($user->id_jadwal);
-        return $this->render('instruksi', ['jadwal' => $jadwal]);
+
+        if ($user->step != 1) {
+            return $this->goBack();
+        } else {
+            $user->step = 1;
+            $user->save();
+            $jadwal = Jadwal::findOne($user->id_jadwal);
+            return $this->render('instruksi', ['jadwal' => $jadwal]);
+        }
     }
 
     public function actionMulaites($id)
     {
-        $this->layout = 'form';
+        $this->layout = 'blank';
+        $peserta = Yii::$app->session->get('peserta');
+        $user = Users::findOne($peserta);
+        $user->step = 2;
+        $user->save();
         $jadwal = Jadwal::findOne($id);
         $soal = Soal::find()->where(['id_jadwal' => $id])->all();
 

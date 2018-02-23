@@ -35,7 +35,7 @@ class Users extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
     {
         return [
             [['username', 'password', 'nama', 'level'], 'required'],
-            [['level', 'id_jadwal'], 'integer'],
+            [['level', 'id_jadwal', 'step'], 'integer'],
             [['username', 'password'], 'string', 'max' => 255],
             [['nama'], 'string', 'max' => 100], 
             [['username'], 'unique'],

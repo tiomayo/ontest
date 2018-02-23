@@ -332,4 +332,9 @@ class SiteController extends Controller
 
         return $this->render('lembarsoal',['jadwal'=>$jadwal,'soal'=>$soal]);
     }
+
+    public function actionSaveHasil($id)
+    {
+        
+    }
 }

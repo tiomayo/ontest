@@ -7,6 +7,10 @@
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
 
+$this->registerCssFile('https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css');
+$this->registerJsFile('https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js');
+$this->registerJsFile('https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js');
+
 $this->title = 'Login';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
@@ -23,6 +27,13 @@ $this->params['breadcrumbs'][] = $this->title;
     <?= $form->field($model, 'username')->textInput(['autofocus' => true, 'placeholder' => 'Username / E-mail']) ?>
 
     <?= $form->field($model, 'password')->passwordInput(['placeholder' => 'Password']) ?>
+
+    <?php if(\Yii::$app->session->hasFlash('eror')) : ?>
+      <div class="alert alert-danger alert-dismissable" style="margin-top: 5%;">
+        <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+        <?php echo \Yii::$app->session->getFlash('eror'); ?>
+      </div>
+    <?php endif; ?>
 
     <div class="form-actions text-center">
         <?= $form->field($model, 'rememberMe')->checkbox([

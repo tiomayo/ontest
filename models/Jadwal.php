@@ -58,6 +58,14 @@ class Jadwal extends \yii\db\ActiveRecord
         return $this->hasMany(Users::className(), ['id_jadwal' => 'id']);
     }
 
+    /**
+    * @return \yii\db\ActiveQuery
+    */
+    public function getSoals() 
+    { 
+       return $this->hasMany(Soal::className(), ['id_jadwal' => 'id']); 
+    }
+
     public function getDurasi($waktu_tes, $waktu_selesai)
     {
         $diff = abs(strtotime($waktu_tes) - strtotime($waktu_selesai));

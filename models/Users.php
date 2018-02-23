@@ -18,8 +18,8 @@ use Yii;
 class Users extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
 {
     public $authKey;
-    const ID_Admin = 1;
-    const ID_Peserta = 2;
+    const admin = 1;
+    const peserta = 2;
     /**
      * @inheritdoc
      */
@@ -34,9 +34,10 @@ class Users extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
     public function rules()
     {
         return [
-            [['username', 'password', 'level'], 'required'],
+            [['username', 'password', 'nama', 'level'], 'required'],
             [['level', 'id_jadwal'], 'integer'],
             [['username', 'password'], 'string', 'max' => 255],
+            [['nama'], 'string', 'max' => 100], 
             [['username'], 'unique'],
             [['username'], 'email'],
             [['password'], 'unique'],
@@ -53,10 +54,19 @@ class Users extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
             'id' => 'ID',
             'id_jadwal' => 'Id Jadwal',
             'username' => 'E-mail',
+            'nama' => 'Nama',
             'password' => 'Password',
             'level' => 'Level',
         ];
     }
+
+    /** 
+    * @return \yii\db\ActiveQuery 
+    */ 
+    public function getHasiltes() 
+    { 
+       return $this->hasMany(Hasiltes::className(), ['id_peserta' => 'id']); 
+    } 
 
     public function getJadwal()
     {

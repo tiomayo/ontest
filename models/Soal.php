@@ -15,6 +15,8 @@ use Yii;
  * @property string $pilihan_C
  * @property string $pilihan_D
  * @property string $kunci_jawaban
+ *
+ * @property Jadwal $jadwal
  */
 class Soal extends \yii\db\ActiveRecord
 {
@@ -24,6 +26,16 @@ class Soal extends \yii\db\ActiveRecord
     public static function tableName()
     {
         return 'soal';
+    }
+
+    public function checkSoal ($attribute,$params)
+    {
+        $record = Soal::find()->where(['id_jadwal'=>$this->id_jadwal])->andWhere(['soal'=>$this->soal])->one();
+
+        if($record) {
+            $this->addError($attribute, 'Soal sudah dipakai');
+        }
+
     }
 
     /**
@@ -36,6 +48,8 @@ class Soal extends \yii\db\ActiveRecord
             [['id_jadwal'], 'integer'],
             [['pilihan_A', 'pilihan_B', 'pilihan_C', 'pilihan_D', 'kunci_jawaban'], 'string'],
             [['soal'], 'string', 'max' => 300],
+            [['soal'], 'checkSoal', 'on' => 'create', 'message'=> ''],
+            [['id_jadwal'], 'exist', 'skipOnError' => true, 'targetClass' => Jadwal::className(), 'targetAttribute' => ['id_jadwal' => 'id']],
         ];
     }
 
@@ -54,5 +68,13 @@ class Soal extends \yii\db\ActiveRecord
             'pilihan_D' => 'Pilihan  D',
             'kunci_jawaban' => 'Kunci Jawaban',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getJadwal()
+    {
+        return $this->hasOne(Jadwal::className(), ['id' => 'id_jadwal']);
     }
 }

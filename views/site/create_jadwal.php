@@ -69,6 +69,7 @@ $this->registerJs($js);
             'formId' => 'jadwal-form',
             'formFields' => [
                 'username',
+                'nama'
             ],
         ]); ?>
             <div class="panel panel-primary">
@@ -93,6 +94,7 @@ $this->registerJs($js);
                                     }
                                 ?>
                                 <?= $form->field($p, "[{$index}]username", ['enableAjaxValidation' => true])->textInput(['maxlength' => true]) ?>
+                                <?= $form->field($p, "[{$index}]nama", ['enableAjaxValidation' => true])->textInput(['maxlength' => true]) ?>
                             </div>
                         </div>
                     <?php endforeach; ?>

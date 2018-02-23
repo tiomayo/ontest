@@ -15,6 +15,7 @@ use app\models\Users;
 use app\models\Jadwal;
 use app\models\Soal;
 use app\models\Model;
+use app\components\AccessRule;
 
 class SiteController extends Controller
 {
@@ -26,8 +27,21 @@ class SiteController extends Controller
         return [
             'access' => [
                 'class' => AccessControl::className(),
-                'only' => ['logout'],
+                'ruleConfig' => [
+                    'class' => AccessRule::className(),
+                ],
+                'only' => ['index','logout','start','next','tambah-peserta','tambah-soal','view'],
                 'rules' => [
+                    [
+                        'actions' => ['index'],
+                        'allow' => true,
+                        'roles' => [Users::admin, Users::peserta],
+                    ],
+                    [
+                        'actions' => ['start','next','tambah-peserta','tambah-soal','view'],
+                        'allow' => true,
+                        'roles' => [Users::admin]
+                    ],
                     [
                         'actions' => ['logout'],
                         'allow' => true,
@@ -72,14 +86,17 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
+        $this->layout = 'form';
+        $isPeserta = Yii::$app->session->get('peserta');
+
         if (Yii::$app->user->isGuest) {
             $this->redirect(['login']);
+        } elseif ($isPeserta) {
+            return $this->render('disclaimer');
         } else {
             $dataProvider = new ActiveDataProvider([
                 'query' => Jadwal::find(),
             ]);
-
-            $this->layout = 'form';
             return $this->render('index', [
                 'dataProvider' => $dataProvider,
             ]);
@@ -97,14 +114,33 @@ class SiteController extends Controller
             return $this->goHome();
         }
 
+        $this->layout = 'login';
         $model = new LoginForm();
-        if ($model->load(Yii::$app->request->post()) && $model->login()) {
-            return $this->goBack();
-        }
+        if ($model->load(Yii::$app->request->post())) {
+            $peserta = Users::find()->where(['username' => $_POST['LoginForm']['username'], 'level' => 2])->one();
 
+            if($peserta){
+                Yii::$app->session->set('peserta',$peserta->id);
+                $jam = Jadwal::find()->where(['id' => $peserta->id_jadwal])->one();
+                if (isset($jam) && (date("Y-m-d H:i:s") > $jam->waktu_tes) && (date("Y-m-d H:i:s") < $jam->waktu_selesai)) {
+                    $model->login();
+                    return $this->goBack();
+                } else {
+                    Yii::$app->session->destroy();
+                    Yii::$app->session->setFlash('eror','Login gagal.');
+                    return $this->render('login', ['model' => $model]);
+                }
+            }
+
+            if($model->login()) {
+                return $this->goBack();
+            } else {
+                Yii::$app->session->destroy();
+                return $this->render('login', ['model' => $model]);
+            }
+        }
         $model->password = '';
 
-        $this->layout = 'login';
         return $this->render('login', [
             'model' => $model,
         ]);
@@ -120,16 +156,6 @@ class SiteController extends Controller
         Yii::$app->user->logout();
 
         return $this->goHome();
-    }
-
-    /**
-     * Displays about page.
-     *
-     * @return string
-     */
-    public function actionAbout()
-    {
-        return $this->render('about');
     }
 
     public function actionStart()
@@ -223,17 +249,87 @@ class SiteController extends Controller
         ]);
     }
 
+    public function actionTambahPeserta($id)
+    {
+        $jadwal = Jadwal::findOne($id);
+        $peserta = new Users();
+
+        if ($peserta->load(Yii::$app->request->post())) {
+            if (Yii::$app->request->isAjax) {
+                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                return ActiveForm::validate($peserta); }
+
+            $peserta->attributes = $_POST['Users'];
+
+            $str = $_POST['Users']['username'];
+            $str = substr($str, 0, 10);
+            $str = hash('sha256', $str);
+            $peserta->password = substr($str, 0,6);
+            $peserta->level = 2;
+            $peserta->id_jadwal = $jadwal->id;
+            $peserta->save();
+
+            return $this->redirect(Yii::$app->request->referrer);
+        }
+
+        return $this->renderAjax('_form-tambah-peserta',[
+            'peserta' => $peserta,
+        ]);
+    }
+
+    public function actionTambahSoal($id)
+    {
+        $jadwal = Jadwal::findOne($id);
+        $soal = new Soal();
+
+        if ($soal->load(Yii::$app->request->post())) {
+            if (Yii::$app->request->isAjax) {
+                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                return ActiveForm::validate($soal); }
+
+            $soal->attributes = $_POST['Soal'];
+            $soal->id_jadwal = $jadwal->id;
+            $soal->save();
+            return $this->redirect(Yii::$app->request->referrer);
+        }
+
+        return $this->renderAjax('_form-tambah-soal',[
+            'soal' => $soal,
+        ]);
+    }
+
     public function actionView($id)
     {
         $this->layout = 'form';
         $jadwal = Jadwal::findOne($id);
         $daftarPeserta = new ActiveDataProvider([
-                'query' => Users::find()->where(['id_jadwal' => $id]),
-            ]);
+            'query' => Users::find()->where(['id_jadwal' => $id]),
+        ]);
+        $daftarSoal = new ActiveDataProvider([
+            'query' => Soal::find()->where(['id_jadwal' => $id]),
+        ]);
 
         return $this->render('view',[
             'jadwal' => $jadwal,
-            'daftarPeserta' => $daftarPeserta
+            'daftarPeserta' => $daftarPeserta,
+            'daftarSoal' => $daftarSoal
         ]);
+    }
+
+    public function actionInstruksi($id)
+    {
+        $this->layout = 'form';
+        $user = Users::findOne($id);
+        $jadwal = Jadwal::findOne($user->id_jadwal);
+        return $this->render('instruksi', ['jadwal' => $jadwal]);
+    }
+
+    public function actionMulaites($id)
+    {
+        $this->layout = 'form';
+        $jadwal = Jadwal::findOne($id);
+        $soal = Soal::find()->where(['id_jadwal' => $id])->all();
+
+        return $this->render('lembarsoal',['jadwal'=>$jadwal,'soal'=>$soal]);
     }
 }
